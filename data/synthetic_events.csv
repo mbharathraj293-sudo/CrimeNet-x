@@ -1,0 +1,16 @@
+event_type,zone_id,node_id,latitude,longitude,severity
+Observed Activity,Z-01,N-04,12.9716,77.5946,low
+Location Recurrence,Z-03,N-01,12.9650,77.5800,medium
+Temporal Correlation,Z-02,N-03,12.9800,77.6100,high
+Network Relationship,Z-05,N-02,12.9900,77.5700,low
+Environmental Observation,Z-07,N-05,13.0000,77.6050,low
+Pattern Observation,Z-03,N-01,12.9648,77.5803,high
+Observed Activity,Z-04,N-02,12.9550,77.6200,low
+Location Recurrence,Z-03,N-01,12.9654,77.5798,medium
+Temporal Correlation,Z-06,N-04,12.9450,77.5900,medium
+Observed Activity,Z-08,N-05,12.9600,77.6300,low
+Network Relationship,Z-02,N-03,12.9804,77.6102,high
+Observed Activity,Z-01,N-04,12.9720,77.5950,low
+Location Recurrence,Z-03,N-01,12.9649,77.5801,high
+Pattern Observation,Z-05,N-02,12.9905,77.5702,medium
+Observed Activity,Z-07,N-05,13.0002,77.6048,low

@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>System Settings — CRIMENET-X</title>
+  <meta name="description" content="System parameters, simulation engine controls, algorithmic thresholds, and academic ethical safeguards.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+</head>
+<body>
+<div class="app-shell">
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <a href="/index.html" class="sidebar-logo">
+        <div class="logo-icon"><i class="fas fa-shield-halved"></i></div>
+        <div class="logo-text">
+          <span class="logo-title">CRIMENET-X</span>
+          <span class="logo-subtitle">Intelligence Analytics</span>
+        </div>
+      </a>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Main</div>
+      <a href="/pages/command-center.html"      class="nav-item"><i class="fas fa-gauge-high"></i>Command Center</a>
+      <a href="/pages/live-events.html"          class="nav-item"><i class="fas fa-bolt"></i>Live Events</a>
+      <a href="/pages/network-intelligence.html" class="nav-item"><i class="fas fa-diagram-project"></i>Network Intelligence</a>
+      <a href="/pages/geo-intelligence.html"     class="nav-item"><i class="fas fa-map-location-dot"></i>Geo Intelligence</a>
+      <a href="/pages/timeline-analysis.html"    class="nav-item"><i class="fas fa-chart-line"></i>Timeline Analysis</a>
+      <div class="nav-section-label" style="margin-top:8px">Operations</div>
+      <a href="/pages/field-nodes.html"          class="nav-item"><i class="fas fa-microchip"></i>Field Nodes</a>
+      <a href="/pages/alert-center.html"         class="nav-item"><i class="fas fa-bell"></i>Alert Center<span class="nav-badge" id="sidebar-alert-count">0</span></a>
+      <a href="/pages/data-management.html"      class="nav-item"><i class="fas fa-database"></i>Data Management</a>
+      <a href="/pages/system-settings.html"      class="nav-item active"><i class="fas fa-sliders"></i>System Settings</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="system-status-indicator">
+        <span class="status-dot" id="sys-dot"></span>
+        <span id="sys-status-text">System Operational</span>
+      </div>
+      <div class="sidebar-version">v1.0.0 · Academic Prototype</div>
+    </div>
+  </aside>
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Top Bar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="btn-hamburger" id="btn-hamburger"><i class="fas fa-bars"></i></button>
+        <div class="search-container">
+          <i class="fas fa-search search-icon"></i>
+          <input type="text" class="search-input" id="global-search" placeholder="Search events, nodes, alerts...">
+          <div class="search-results hidden" id="search-results"></div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="demo-badge" id="demo-badge"><span class="live-dot"></span>DEMO LIVE</div>
+        <div class="topbar-indicator" id="api-indicator" style="color:var(--color-text-muted)">● Connecting...</div>
+        <div class="topbar-indicator ws-indicator" style="color:var(--color-text-muted)">● Connecting...</div>
+        <span class="topbar-time" id="topbar-clock"></span>
+        <button class="topbar-btn" title="Notifications" onclick="window.location='/pages/alert-center.html'">
+          <i class="fas fa-bell"></i>
+          <span class="notification-badge" id="notif-badge">0</span>
+        </button>
+        <div class="user-avatar" title="Analyst">AN</div>
+      </div>
+    </header>
+
+    <!-- Page Body -->
+    <div class="page-body">
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="page-header-row">
+          <div>
+            <h1 class="page-title">System Settings</h1>
+            <p class="page-subtitle">Simulation engine parameters, pattern detection sensitivity, and academic ethical guardrails.</p>
+          </div>
+          <div class="flex gap-3 items-center">
+            <button class="btn btn-primary" onclick="saveSettings()">
+              <i class="fas fa-floppy-disk"></i> Save Preferences
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Settings Grid -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-5);margin-bottom:var(--space-5)">
+        <!-- Simulation Engine Configuration Card -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="fas fa-play"></i> Simulation & Demo Engine</div>
+          </div>
+          <div class="card-body" style="display:flex;flex-direction:column;gap:var(--space-4)">
+            <div>
+              <div class="flex justify-between items-center" style="margin-bottom:4px">
+                <label class="form-label" style="margin:0">Demo Engine State</label>
+                <span id="demo-status-pill" class="badge badge-low">STOPPED</span>
+              </div>
+              <div class="flex gap-3" style="margin-top:var(--space-2)">
+                <button id="btn-settings-demo-start" class="btn btn-primary btn-sm" onclick="App.toggleDemo()">
+                  <i class="fas fa-play"></i> Start Event Generator
+                </button>
+                <button id="btn-settings-demo-stop" class="btn btn-danger btn-sm hidden" onclick="App.toggleDemo()">
+                  <i class="fas fa-stop"></i> Stop Generator
+                </button>
+              </div>
+            </div>
+
+            <div style="border-top:1px solid var(--color-border);padding-top:var(--space-3)">
+              <div class="flex justify-between items-center" style="margin-bottom:6px">
+                <label class="form-label" style="margin:0">Event Cadence Interval (seconds)</label>
+                <span id="val-cadence" style="font-family:var(--font-mono);font-size:var(--text-xs);color:var(--color-accent)">3.0s</span>
+              </div>
+              <input type="range" min="1" max="10" step="0.5" value="3" class="form-control" style="padding:0;cursor:pointer" id="input-cadence" oninput="updateCadenceVal(this.value)">
+              <div class="flex justify-between" style="font-size:10px;color:var(--color-text-muted);margin-top:2px">
+                <span>1s (Rapid)</span>
+                <span>5s (Standard)</span>
+                <span>10s (Sparse)</span>
+              </div>
+            </div>
+
+            <div style="border-top:1px solid var(--color-border);padding-top:var(--space-3)">
+              <label class="form-label">Active Sectors for Synthetic Distribution</label>
+              <div style="display:grid;grid-template-columns:repeat(4, 1fr);gap:var(--space-2);font-size:var(--text-xs)">
+                <label><input type="checkbox" checked> Z-01</label>
+                <label><input type="checkbox" checked> Z-02</label>
+                <label><input type="checkbox" checked> Z-03</label>
+                <label><input type="checkbox" checked> Z-04</label>
+                <label><input type="checkbox" checked> Z-05</label>
+                <label><input type="checkbox" checked> Z-06</label>
+                <label><input type="checkbox" checked> Z-07</label>
+                <label><input type="checkbox" checked> Z-08</label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Pattern Detection Sensitivity Card -->
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="fas fa-brain"></i> Algorithmic Sensitivity Thresholds</div>
+          </div>
+          <div class="card-body" style="display:flex;flex-direction:column;gap:var(--space-4)">
+            <div>
+              <div class="flex justify-between items-center" style="margin-bottom:6px">
+                <label class="form-label" style="margin:0">Recurrence Threshold for Hotspot Flagging</label>
+                <span id="val-hotspot-thresh" style="font-family:var(--font-mono);font-size:var(--text-xs);color:var(--color-accent)">15 observations</span>
+              </div>
+              <input type="range" min="5" max="50" step="5" value="15" class="form-control" style="padding:0;cursor:pointer" oninput="document.getElementById('val-hotspot-thresh').textContent = this.value + ' observations'">
+            </div>
+
+            <div style="border-top:1px solid var(--color-border);padding-top:var(--space-3)">
+              <div class="flex justify-between items-center" style="margin-bottom:6px">
+                <label class="form-label" style="margin:0">Analytical Pattern Score Weight: Network Centrality</label>
+                <span id="val-centrality-weight" style="font-family:var(--font-mono);font-size:var(--text-xs);color:var(--color-accent)">60%</span>
+              </div>
+              <input type="range" min="10" max="90" step="5" value="60" class="form-control" style="padding:0;cursor:pointer" oninput="document.getElementById('val-centrality-weight').textContent = this.value + '%'">
+            </div>
+
+            <div style="border-top:1px solid var(--color-border);padding-top:var(--space-3)">
+              <div class="flex justify-between items-center" style="margin-bottom:6px">
+                <label class="form-label" style="margin:0">Diurnal Night Shift Weighting</label>
+                <span id="val-night-weight" style="font-family:var(--font-mono);font-size:var(--text-xs);color:var(--color-accent)">1.5x</span>
+              </div>
+              <input type="range" min="1.0" max="3.0" step="0.1" value="1.5" class="form-control" style="padding:0;cursor:pointer" oninput="document.getElementById('val-night-weight').textContent = this.value + 'x'">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ethical Safeguards Matrix Card -->
+      <div class="card" style="margin-bottom:var(--space-5)">
+        <div class="card-header">
+          <div class="card-title"><i class="fas fa-shield-halved"></i> Academic Ethical Safeguards Matrix</div>
+        </div>
+        <div class="card-body">
+          <div style="display:grid;grid-template-columns:repeat(2, 1fr);gap:var(--space-4);font-size:var(--text-xs)">
+            <div style="background:var(--color-bg-secondary);padding:var(--space-4);border-radius:var(--radius-md);border:1px solid var(--color-border)">
+              <div style="font-weight:600;color:var(--color-success);margin-bottom:6px">
+                <i class="fas fa-check-circle"></i> Strict Synthetic Guarantee
+              </div>
+              <p style="color:var(--color-text-secondary);margin:0;line-height:1.6">
+                All records within CRIMENET-X are generated through pseudo-random spatial and statistical algorithms. No personally identifiable real-world human data exists in this environment.
+              </p>
+            </div>
+            <div style="background:var(--color-bg-secondary);padding:var(--space-4);border-radius:var(--radius-md);border:1px solid var(--color-border)">
+              <div style="font-weight:600;color:var(--color-success);margin-bottom:6px">
+                <i class="fas fa-check-circle"></i> No Automated Judicial Decisions
+              </div>
+              <p style="color:var(--color-text-secondary);margin:0;line-height:1.6">
+                The platform contains zero automated enforcement logic. High-scoring pattern clusters require human analyst validation and cannot trigger any physical or legal action.
+              </p>
+            </div>
+            <div style="background:var(--color-bg-secondary);padding:var(--space-4);border-radius:var(--radius-md);border:1px solid var(--color-border)">
+              <div style="font-weight:600;color:var(--color-success);margin-bottom:6px">
+                <i class="fas fa-check-circle"></i> Prohibited Biometric Systems
+              </div>
+              <p style="color:var(--color-text-secondary);margin:0;line-height:1.6">
+                Facial recognition, voice biometrics, gait identification, and real-world video surveillance pipelines are strictly prohibited and disabled in this architecture.
+              </p>
+            </div>
+            <div style="background:var(--color-bg-secondary);padding:var(--space-4);border-radius:var(--radius-md);border:1px solid var(--color-border)">
+              <div style="font-weight:600;color:var(--color-success);margin-bottom:6px">
+                <i class="fas fa-check-circle"></i> Pure Statistical Terminology
+              </div>
+              <p style="color:var(--color-text-secondary);margin:0;line-height:1.6">
+                All metrics are designated as <i>Analytical Pattern Scores</i> or <i>Spatial Recurrence Rates</i>. No terminology implying criminal guilt or probability of future crime is permitted.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /page-body -->
+  </main>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- Scripts -->
+<script src="/js/api.js"></script>
+<script src="/js/websocket.js"></script>
+<script src="/js/app.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  await checkDemoStatus();
+
+  wsClient.on('demo_started', () => updateDemoUI(true));
+  wsClient.on('demo_stopped', () => updateDemoUI(false));
+});
+
+async function checkDemoStatus() {
+  try {
+    const status = await API.getDemoStatus();
+    updateDemoUI(status && status.running);
+  } catch (err) {
+    console.error('Demo status query failed:', err);
+  }
+}
+
+function updateDemoUI(isRunning) {
+  const pill = document.getElementById('demo-status-pill');
+  const startBtn = document.getElementById('btn-settings-demo-start');
+  const stopBtn = document.getElementById('btn-settings-demo-stop');
+
+  if (isRunning) {
+    pill.className = 'badge badge-online';
+    pill.textContent = 'RUNNING';
+    startBtn.classList.add('hidden');
+    stopBtn.classList.remove('hidden');
+  } else {
+    pill.className = 'badge badge-low';
+    pill.textContent = 'STOPPED';
+    startBtn.classList.remove('hidden');
+    stopBtn.classList.add('hidden');
+  }
+}
+
+function updateCadenceVal(val) {
+  document.getElementById('val-cadence').textContent = `${parseFloat(val).toFixed(1)}s`;
+}
+
+function saveSettings() {
+  Toast.success('Settings Saved', 'Simulation and algorithmic preferences updated.');
+}
+</script>
+</body>
+</html>

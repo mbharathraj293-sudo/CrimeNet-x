@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>CRIMENET-X — Intelligence Analytics Platform</title>
+  <meta name="description" content="CrimeNet-X: Criminal Network Intelligence & Incident Analysis System. Academic prototype using synthetic data only.">
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+  <!-- Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+
+  <style>
+    .landing-wrapper {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      height: 100vh;
+      background: var(--color-bg-primary);
+      flex-direction: column;
+      gap: var(--space-8);
+      text-align: center;
+      padding: var(--space-6);
+    }
+
+    .landing-logo {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: var(--space-4);
+    }
+
+    .landing-icon {
+      width: 80px;
+      height: 80px;
+      background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+      border-radius: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 36px;
+      color: white;
+      box-shadow: 0 20px 60px rgba(59,130,246,0.4);
+      animation: pulse-glow 2s ease infinite;
+    }
+
+    .landing-title {
+      font-size: 42px;
+      font-weight: 800;
+      letter-spacing: -2px;
+      background: linear-gradient(135deg, #f1f5f9, #94a3b8);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .landing-subtitle {
+      font-size: var(--text-md);
+      color: var(--color-text-muted);
+      max-width: 480px;
+      line-height: 1.7;
+    }
+
+    .landing-nav {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-4);
+      max-width: 800px;
+      width: 100%;
+    }
+
+    .landing-nav-item {
+      background: var(--color-bg-card);
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-lg);
+      padding: var(--space-5);
+      text-decoration: none;
+      color: var(--color-text-secondary);
+      transition: var(--transition-normal);
+      text-align: left;
+    }
+
+    .landing-nav-item:hover {
+      border-color: var(--color-accent);
+      background: var(--color-bg-elevated);
+      transform: translateY(-2px);
+      box-shadow: var(--shadow-md);
+      color: var(--color-text-primary);
+    }
+
+    .landing-nav-item i {
+      font-size: 20px;
+      color: var(--color-accent);
+      margin-bottom: var(--space-3);
+      display: block;
+    }
+
+    .landing-nav-item-title { font-weight: 600; font-size: var(--text-sm); color: var(--color-text-primary); }
+    .landing-nav-item-desc  { font-size: var(--text-xs); color: var(--color-text-muted); margin-top: 4px; }
+
+    .landing-disclaimer {
+      font-size: var(--text-xs);
+      color: var(--color-text-muted);
+      max-width: 560px;
+      background: rgba(59,130,246,0.06);
+      border: 1px solid rgba(59,130,246,0.15);
+      border-radius: var(--radius-md);
+      padding: var(--space-3) var(--space-4);
+      line-height: 1.6;
+    }
+
+    .btn-enter {
+      display: inline-flex;
+      align-items: center;
+      gap: var(--space-3);
+      background: var(--color-accent);
+      color: white;
+      padding: var(--space-4) var(--space-8);
+      border-radius: var(--radius-lg);
+      font-size: var(--text-md);
+      font-weight: 600;
+      text-decoration: none;
+      transition: var(--transition-normal);
+      box-shadow: 0 8px 24px rgba(59,130,246,0.3);
+    }
+    .btn-enter:hover {
+      background: var(--color-accent-hover);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px rgba(59,130,246,0.4);
+      color: white;
+    }
+
+    @media (max-width: 640px) {
+      .landing-nav { grid-template-columns: 1fr; }
+      .landing-title { font-size: 30px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="landing-wrapper">
+    <div class="landing-logo">
+      <div class="landing-icon">
+        <i class="fas fa-shield-halved"></i>
+      </div>
+      <div>
+        <div class="landing-title">CRIMENET-X</div>
+        <div class="landing-subtitle" style="margin-top:8px">
+          Criminal Network Intelligence & Incident Analysis System<br>
+          <small style="color:var(--color-text-muted);font-size:12px">Academic Prototype · Synthetic Data Only</small>
+        </div>
+      </div>
+    </div>
+
+    <a href="/pages/command-center.html" class="btn-enter">
+      <i class="fas fa-arrow-right-to-bracket"></i>
+      Open Command Dashboard
+    </a>
+
+    <div class="landing-nav">
+      <a href="/pages/command-center.html" class="landing-nav-item">
+        <i class="fas fa-gauge-high"></i>
+        <div class="landing-nav-item-title">Command Center</div>
+        <div class="landing-nav-item-desc">Unified overview of all observed activity patterns</div>
+      </a>
+      <a href="/pages/network-intelligence.html" class="landing-nav-item">
+        <i class="fas fa-diagram-project"></i>
+        <div class="landing-nav-item-title">Network Intelligence</div>
+        <div class="landing-nav-item-desc">Relationship graphs with Analytical Pattern Scores</div>
+      </a>
+      <a href="/pages/geo-intelligence.html" class="landing-nav-item">
+        <i class="fas fa-map-location-dot"></i>
+        <div class="landing-nav-item-title">Geo Intelligence</div>
+        <div class="landing-nav-item-desc">Geospatial hotspot analysis and zone mapping</div>
+      </a>
+      <a href="/pages/live-events.html" class="landing-nav-item">
+        <i class="fas fa-bolt"></i>
+        <div class="landing-nav-item-title">Live Events</div>
+        <div class="landing-nav-item-desc">Real-time event feed from ESP32 field nodes</div>
+      </a>
+      <a href="/pages/timeline-analysis.html" class="landing-nav-item">
+        <i class="fas fa-chart-line"></i>
+        <div class="landing-nav-item-title">Timeline Analysis</div>
+        <div class="landing-nav-item-desc">Temporal pattern analysis and activity distributions</div>
+      </a>
+      <a href="/docs" class="landing-nav-item">
+        <i class="fas fa-code"></i>
+        <div class="landing-nav-item-title">API Documentation</div>
+        <div class="landing-nav-item-desc">FastAPI Swagger UI and OpenAPI specification</div>
+      </a>
+    </div>
+
+    <div class="landing-disclaimer">
+      <i class="fas fa-circle-info" style="color:var(--color-accent)"></i>
+      <strong style="color:var(--color-text-secondary)"> Academic Prototype.</strong>
+      All data shown is completely synthetic. No real persons are identified. No automated enforcement decisions are made.
+      All analytical pattern scores require human review before any action.
+    </div>
+  </div>
+</body>
+</html>

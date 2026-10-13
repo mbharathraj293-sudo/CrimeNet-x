@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Command Center — CRIMENET-X</title>
+  <meta name="description" content="Unified intelligence overview dashboard for CrimeNet-X analytics platform.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+</head>
+<body>
+<div class="app-shell">
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <a href="/index.html" class="sidebar-logo">
+        <div class="logo-icon"><i class="fas fa-shield-halved"></i></div>
+        <div class="logo-text">
+          <span class="logo-title">CRIMENET-X</span>
+          <span class="logo-subtitle">Intelligence Analytics</span>
+        </div>
+      </a>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Main</div>
+      <a href="/pages/command-center.html"      class="nav-item active"><i class="fas fa-gauge-high"></i>Command Center</a>
+      <a href="/pages/live-events.html"          class="nav-item"><i class="fas fa-bolt"></i>Live Events</a>
+      <a href="/pages/network-intelligence.html" class="nav-item"><i class="fas fa-diagram-project"></i>Network Intelligence</a>
+      <a href="/pages/geo-intelligence.html"     class="nav-item"><i class="fas fa-map-location-dot"></i>Geo Intelligence</a>
+      <a href="/pages/timeline-analysis.html"    class="nav-item"><i class="fas fa-chart-line"></i>Timeline Analysis</a>
+      <div class="nav-section-label" style="margin-top:8px">Operations</div>
+      <a href="/pages/field-nodes.html"          class="nav-item"><i class="fas fa-microchip"></i>Field Nodes</a>
+      <a href="/pages/alert-center.html"         class="nav-item"><i class="fas fa-bell"></i>Alert Center<span class="nav-badge" id="sidebar-alert-count">4</span></a>
+      <a href="/pages/data-management.html"      class="nav-item"><i class="fas fa-database"></i>Data Management</a>
+      <a href="/pages/system-settings.html"      class="nav-item"><i class="fas fa-sliders"></i>System Settings</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="system-status-indicator">
+        <span class="status-dot" id="sys-dot"></span>
+        <span id="sys-status-text">System Operational</span>
+      </div>
+      <div class="sidebar-version">v1.0.0 · Academic Prototype</div>
+    </div>
+  </aside>
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Top Bar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="btn-hamburger" id="btn-hamburger"><i class="fas fa-bars"></i></button>
+        <div class="search-container">
+          <i class="fas fa-search search-icon"></i>
+          <input type="text" class="search-input" id="global-search" placeholder="Search events, nodes, alerts...">
+          <div class="search-results hidden" id="search-results"></div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="demo-badge" id="demo-badge"><span class="live-dot"></span>DEMO LIVE</div>
+        <div class="topbar-indicator" id="api-indicator" style="color:var(--color-text-muted)">● Connecting...</div>
+        <div class="topbar-indicator ws-indicator" style="color:var(--color-text-muted)">● Connecting...</div>
+        <span class="topbar-time" id="topbar-clock"></span>
+        <button class="topbar-btn" title="Notifications" onclick="window.location='/pages/alert-center.html'">
+          <i class="fas fa-bell"></i>
+          <span class="notification-badge" id="notif-badge">4</span>
+        </button>
+        <div class="user-avatar" title="Analyst">AN</div>
+      </div>
+    </header>
+
+    <!-- Page Body -->
+    <div class="page-body">
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="page-header-row">
+          <div>
+            <h1 class="page-title">Command Center</h1>
+            <p class="page-subtitle">Unified overview of observed activity patterns and network relationships.</p>
+          </div>
+          <div class="flex gap-3 items-center">
+            <button id="btn-demo-start" class="btn btn-primary" onclick="App.toggleDemo()">
+              <i class="fas fa-play"></i> Start Demo
+            </button>
+            <button id="btn-demo-stop" class="btn btn-danger hidden" onclick="App.toggleDemo()">
+              <i class="fas fa-stop"></i> Stop Demo
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- KPI Cards -->
+      <div class="dashboard-row-1" style="margin-bottom:var(--space-5)">
+        <div class="kpi-card" style="--kpi-color:#3b82f6;--kpi-bg:rgba(59,130,246,0.12)">
+          <div class="kpi-header">
+            <div class="kpi-icon"><i class="fas fa-bolt"></i></div>
+            <div class="kpi-trend" id="kpi-events-trend"><i class="fas fa-arrow-up"></i> +12.4%</div>
+          </div>
+          <div class="kpi-value" id="kpi-total-events">—</div>
+          <div class="kpi-label">Total Events</div>
+          <div class="kpi-sub">Synthetic observations recorded</div>
+        </div>
+        <div class="kpi-card" style="--kpi-color:#22c55e;--kpi-bg:rgba(34,197,94,0.12)">
+          <div class="kpi-header">
+            <div class="kpi-icon"><i class="fas fa-microchip"></i></div>
+            <div class="kpi-trend"><i class="fas fa-equals"></i> Stable</div>
+          </div>
+          <div class="kpi-value" id="kpi-nodes">—</div>
+          <div class="kpi-label">Active Field Nodes</div>
+          <div class="kpi-sub" id="kpi-nodes-sub">Online / Total</div>
+        </div>
+        <div class="kpi-card" style="--kpi-color:#a78bfa;--kpi-bg:rgba(167,139,250,0.12)">
+          <div class="kpi-header">
+            <div class="kpi-icon"><i class="fas fa-diagram-project"></i></div>
+            <div class="kpi-trend"><i class="fas fa-arrow-up"></i> +2</div>
+          </div>
+          <div class="kpi-value" id="kpi-networks">—</div>
+          <div class="kpi-label">Detected Networks</div>
+          <div class="kpi-sub">Network clusters identified</div>
+        </div>
+        <div class="kpi-card" style="--kpi-color:#ef4444;--kpi-bg:rgba(239,68,68,0.12)">
+          <div class="kpi-header">
+            <div class="kpi-icon"><i class="fas fa-triangle-exclamation"></i></div>
+            <div class="kpi-trend down"><i class="fas fa-arrow-up"></i> Active</div>
+          </div>
+          <div class="kpi-value" id="kpi-alerts">—</div>
+          <div class="kpi-label">Active Alerts</div>
+          <div class="kpi-sub">Requiring human review</div>
+        </div>
+      </div>
+
+      <!-- Row 2: Activity Chart + System Status -->
+      <div class="dashboard-row-2" style="margin-bottom:var(--space-5)">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="fas fa-chart-line"></i>Activity Overview</div>
+            <div class="live-indicator"><span class="live-dot"></span> Live Updates</div>
+          </div>
+          <div class="card-body">
+            <div class="chart-container" style="height:260px">
+              <canvas id="chart-activity"></canvas>
+            </div>
+          </div>
+        </div>
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="fas fa-server"></i>System Status</div>
+          </div>
+          <div class="card-body">
+            <div class="status-grid">
+              <div class="status-item">
+                <div class="status-item-label">API</div>
+                <div class="status-item-value" id="status-api"><i class="fas fa-circle" style="font-size:8px"></i> Checking...</div>
+              </div>
+              <div class="status-item">
+                <div class="status-item-label">Database</div>
+                <div class="status-item-value"><i class="fas fa-circle" style="font-size:8px;color:var(--color-success)"></i> Online</div>
+              </div>
+              <div class="status-item">
+                <div class="status-item-label">WebSocket</div>
+                <div class="status-item-value ws-indicator" style="color:var(--color-text-muted);font-size:12px">● Connecting</div>
+              </div>
+              <div class="status-item">
+                <div class="status-item-label">Analytics Engine</div>
+                <div class="status-item-value"><i class="fas fa-circle" style="font-size:8px;color:var(--color-success)"></i> Ready</div>
+              </div>
+            </div>
+
+            <div style="margin-top:var(--space-5)">
+              <div class="card-title" style="font-size:var(--text-xs);margin-bottom:var(--space-3)"><i class="fas fa-sparkles"></i>Emerging Patterns</div>
+              <div id="patterns-list">
+                <div class="state-empty" style="padding:var(--space-6)">
+                  <i class="fas fa-magnifying-glass"></i>
+                  <p>Analysing patterns...</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Row 3: Map + Priority Alerts -->
+      <div class="dashboard-row-3" style="margin-bottom:var(--space-5)">
+        <div class="card">
+          <div class="card-header">
+            <div class="card-title"><i class="fas fa-map-location-dot"></i>Geographic Activity</div>
+            <a href="/pages/geo-intelligence.html" class="btn btn-ghost btn-sm">View Full Map <i class="fas fa-arrow-right"></i></a>
+          </div>
+          <div class="card-body" style="padding:0">
+            <div id="main-map" style="height:380px;border-radius:0 0 var(--radius-lg) var(--radius-lg)"></div>
+          </div>
+        </div>
+        <div class="card" style="overflow-y:auto">
+          <div class="card-header">
+            <div class="card-title"><i class="fas fa-bell"></i>Priority Alerts</div>
+            <a href="/pages/alert-center.html" class="btn btn-ghost btn-sm">All Alerts</a>
+          </div>
+          <div class="card-body" style="padding:var(--space-4)">
+            <div id="priority-alerts-list">
+              <div class="flex items-center justify-center" style="height:120px">
+                <div class="loading-spinner"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div><!-- /page-body -->
+  </main>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="/js/api.js"></script>
+<script src="/js/websocket.js"></script>
+<script src="/js/app.js"></script>
+<script src="/js/charts.js"></script>
+<script src="/js/map.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  // Init map
+  const map = MapModule.init('main-map', { center: [12.9716, 77.5946], zoom: 12 });
+
+  // Load all data
+  await loadDashboard();
+
+  // Auto-refresh every 30s
+  setInterval(loadDashboard, 30000);
+
+  // WS listener for live events
+  wsClient.on('new_event', (msg) => {
+    const ev = msg.event;
+    if (!ev) return;
+    MapModule.addLiveMarker('main-map', ev);
+
+    // Update KPI
+    const kpiEl = document.getElementById('kpi-total-events');
+    if (kpiEl) kpiEl.textContent = parseInt(kpiEl.textContent || 0) + 1;
+  });
+});
+
+async function loadDashboard() {
+  try {
+    const [analytics, hotspots, nodes, alerts] = await Promise.allSettled([
+      API.getAnalytics(),
+      API.getHotspots(),
+      API.getNodes(),
+      API.getAlerts({ status: 'new' }),
+    ]);
+
+    if (analytics.status === 'fulfilled') {
+      const d = analytics.value;
+      document.getElementById('kpi-total-events').textContent = d.summary.total_events;
+      document.getElementById('kpi-alerts').textContent = d.summary.active_alerts;
+      document.getElementById('kpi-networks').textContent = d.summary.total_networks;
+      document.getElementById('kpi-nodes').textContent = `${d.summary.online_nodes} / ${d.summary.total_nodes}`;
+      document.getElementById('kpi-nodes-sub').textContent = `${d.summary.online_nodes} online of ${d.summary.total_nodes}`;
+      document.getElementById('sidebar-alert-count').textContent = d.summary.active_alerts;
+      document.getElementById('notif-badge').textContent = d.summary.active_alerts;
+
+      // Activity chart
+      Charts.createActivityChart('chart-activity', d.activity_trend);
+
+      // Status
+      document.getElementById('status-api').innerHTML = '<i class="fas fa-circle" style="font-size:8px;color:var(--color-success)"></i> Connected';
+
+      // Patterns
+      renderPatterns(d.emerging_patterns);
+    }
+
+    if (hotspots.status === 'fulfilled') {
+      const h = hotspots.value;
+      MapModule.addEventMarkers('main-map', h.markers || []);
+      MapModule.addHotspotCircles('main-map', h.hotspots || []);
+    }
+
+    if (nodes.status === 'fulfilled') {
+      MapModule.addNodeMarkers('main-map', nodes.value);
+    }
+
+    if (alerts.status === 'fulfilled') {
+      renderPriorityAlerts(alerts.value.slice(0, 4));
+    }
+  } catch(e) {
+    console.error('Dashboard load error:', e);
+  }
+}
+
+function renderPatterns(patterns) {
+  const el = document.getElementById('patterns-list');
+  if (!patterns || !patterns.length) {
+    el.innerHTML = '<p style="font-size:12px;color:var(--color-text-muted);text-align:center;padding:12px">No patterns detected.</p>';
+    return;
+  }
+  el.innerHTML = patterns.slice(0, 4).map(p => `
+    <div class="pattern-card">
+      <div class="pattern-type"><i class="fas fa-circle" style="font-size:6px;color:${p.severity==='high'?'var(--color-danger)':'var(--color-warning)'}"></i> ${p.pattern_type}</div>
+      <div class="pattern-desc">${p.description?.slice(0, 100)}${p.description?.length > 100 ? '...' : ''}</div>
+      ${p.zone_id ? `<div style="font-size:10px;color:var(--color-accent);margin-top:4px"><i class="fas fa-location-dot"></i> ${p.zone_id}</div>` : ''}
+    </div>
+  `).join('');
+}
+
+function renderPriorityAlerts(alerts) {
+  const el = document.getElementById('priority-alerts-list');
+  if (!alerts || !alerts.length) {
+    el.innerHTML = '<div class="state-empty" style="padding:var(--space-6)"><i class="fas fa-check-circle" style="color:var(--color-success)"></i><p>No active alerts.</p></div>';
+    return;
+  }
+  el.innerHTML = alerts.map(a => `
+    <div class="alert-item sev-${a.severity}" style="margin-bottom:10px;padding:12px">
+      <div class="alert-icon ${a.severity}"><i class="fas fa-triangle-exclamation"></i></div>
+      <div class="alert-content">
+        <div style="display:flex;gap:6px;align-items:center;margin-bottom:4px">
+          ${App.severityBadge(a.severity)}
+          <span style="font-size:11px;color:var(--color-text-muted)">${a.zone_id}</span>
+        </div>
+        <div class="alert-title" style="font-size:13px">${a.title}</div>
+        <div class="alert-desc">${a.description?.slice(0,80)}...</div>
+        <div class="review-banner" style="font-size:10px;padding:2px 8px">
+          <i class="fas fa-user-check"></i> Requires Human Review
+        </div>
+      </div>
+    </div>
+  `).join('');
+}
+</script>
+</body>
+</html>

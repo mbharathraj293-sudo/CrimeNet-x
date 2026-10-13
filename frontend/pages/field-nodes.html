@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Field Nodes — CRIMENET-X</title>
+  <meta name="description" content="ESP32 IoT edge field node monitoring, battery health, wireless signal telemetry, and remote status controls.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+</head>
+<body>
+<div class="app-shell">
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <a href="/index.html" class="sidebar-logo">
+        <div class="logo-icon"><i class="fas fa-shield-halved"></i></div>
+        <div class="logo-text">
+          <span class="logo-title">CRIMENET-X</span>
+          <span class="logo-subtitle">Intelligence Analytics</span>
+        </div>
+      </a>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Main</div>
+      <a href="/pages/command-center.html"      class="nav-item"><i class="fas fa-gauge-high"></i>Command Center</a>
+      <a href="/pages/live-events.html"          class="nav-item"><i class="fas fa-bolt"></i>Live Events</a>
+      <a href="/pages/network-intelligence.html" class="nav-item"><i class="fas fa-diagram-project"></i>Network Intelligence</a>
+      <a href="/pages/geo-intelligence.html"     class="nav-item"><i class="fas fa-map-location-dot"></i>Geo Intelligence</a>
+      <a href="/pages/timeline-analysis.html"    class="nav-item"><i class="fas fa-chart-line"></i>Timeline Analysis</a>
+      <div class="nav-section-label" style="margin-top:8px">Operations</div>
+      <a href="/pages/field-nodes.html"          class="nav-item active"><i class="fas fa-microchip"></i>Field Nodes</a>
+      <a href="/pages/alert-center.html"         class="nav-item"><i class="fas fa-bell"></i>Alert Center<span class="nav-badge" id="sidebar-alert-count">0</span></a>
+      <a href="/pages/data-management.html"      class="nav-item"><i class="fas fa-database"></i>Data Management</a>
+      <a href="/pages/system-settings.html"      class="nav-item"><i class="fas fa-sliders"></i>System Settings</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="system-status-indicator">
+        <span class="status-dot" id="sys-dot"></span>
+        <span id="sys-status-text">System Operational</span>
+      </div>
+      <div class="sidebar-version">v1.0.0 · Academic Prototype</div>
+    </div>
+  </aside>
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Top Bar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="btn-hamburger" id="btn-hamburger"><i class="fas fa-bars"></i></button>
+        <div class="search-container">
+          <i class="fas fa-search search-icon"></i>
+          <input type="text" class="search-input" id="global-search" placeholder="Search events, nodes, alerts...">
+          <div class="search-results hidden" id="search-results"></div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="demo-badge" id="demo-badge"><span class="live-dot"></span>DEMO LIVE</div>
+        <div class="topbar-indicator" id="api-indicator" style="color:var(--color-text-muted)">● Connecting...</div>
+        <div class="topbar-indicator ws-indicator" style="color:var(--color-text-muted)">● Connecting...</div>
+        <span class="topbar-time" id="topbar-clock"></span>
+        <button class="topbar-btn" title="Notifications" onclick="window.location='/pages/alert-center.html'">
+          <i class="fas fa-bell"></i>
+          <span class="notification-badge" id="notif-badge">0</span>
+        </button>
+        <div class="user-avatar" title="Analyst">AN</div>
+      </div>
+    </header>
+
+    <!-- Page Body -->
+    <div class="page-body">
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="page-header-row">
+          <div>
+            <h1 class="page-title">Field Nodes</h1>
+            <p class="page-subtitle">ESP32 IoT sensor telemetry, edge sensor node operational health, battery levels, and Wi-Fi link diagnostics.</p>
+          </div>
+          <div class="flex gap-3 items-center">
+            <button class="btn btn-secondary" onclick="loadNodes()">
+              <i class="fas fa-arrows-rotate"></i> Poll Nodes
+            </button>
+            <button id="btn-demo-start" class="btn btn-primary" onclick="App.toggleDemo()">
+              <i class="fas fa-play"></i> Start Demo
+            </button>
+            <button id="btn-demo-stop" class="btn btn-danger hidden" onclick="App.toggleDemo()">
+              <i class="fas fa-stop"></i> Stop Demo
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Quick Metrics Cards -->
+      <div class="dashboard-row-1" style="margin-bottom:var(--space-5)">
+        <div class="kpi-card" style="--kpi-color:#22c55e;--kpi-bg:rgba(34,197,94,0.12)">
+          <div class="kpi-header">
+            <div class="kpi-icon"><i class="fas fa-satellite-dish"></i></div>
+            <div class="kpi-trend"><i class="fas fa-check"></i> Operational</div>
+          </div>
+          <div class="kpi-value" id="kpi-online-count">—</div>
+          <div class="kpi-label">Active Field Nodes</div>
+          <div class="kpi-sub" id="kpi-online-sub">Online / Total deployed</div>
+        </div>
+        <div class="kpi-card" style="--kpi-color:#3b82f6;--kpi-bg:rgba(59,130,246,0.12)">
+          <div class="kpi-header">
+            <div class="kpi-icon"><i class="fas fa-battery-three-quarters"></i></div>
+            <div class="kpi-trend"><i class="fas fa-bolt"></i> Average</div>
+          </div>
+          <div class="kpi-value" id="kpi-avg-battery">—</div>
+          <div class="kpi-label">Average Battery Health</div>
+          <div class="kpi-sub">Across all field sensors</div>
+        </div>
+        <div class="kpi-card" style="--kpi-color:#f59e0b;--kpi-bg:rgba(245,158,11,0.12)">
+          <div class="kpi-header">
+            <div class="kpi-icon"><i class="fas fa-wifi"></i></div>
+            <div class="kpi-trend"><i class="fas fa-signal"></i> Signal</div>
+          </div>
+          <div class="kpi-value" id="kpi-avg-rssi">—</div>
+          <div class="kpi-label">Average RSSI Strength</div>
+          <div class="kpi-sub">Wi-Fi reception dBm</div>
+        </div>
+        <div class="kpi-card" style="--kpi-color:#a78bfa;--kpi-bg:rgba(167,139,250,0.12)">
+          <div class="kpi-header">
+            <div class="kpi-icon"><i class="fas fa-microchip"></i></div>
+            <div class="kpi-trend"><i class="fas fa-code-branch"></i> v2.1.0</div>
+          </div>
+          <div class="kpi-value" id="kpi-firmware-status">Uniform</div>
+          <div class="kpi-label">Firmware Distribution</div>
+          <div class="kpi-sub">All nodes running standard build</div>
+        </div>
+      </div>
+
+      <!-- Nodes Grid Container -->
+      <div class="nodes-grid" id="nodes-grid-container" style="margin-bottom:var(--space-5)">
+        <div class="flex items-center justify-center" style="grid-column:1/-1;height:160px">
+          <div class="loading-spinner"></div>
+        </div>
+      </div>
+
+      <!-- Edge Architecture & Telemetry Specs Card -->
+      <div class="card">
+        <div class="card-header">
+          <div class="card-title"><i class="fas fa-circle-info"></i> ESP32 Field Node Telemetry Specifications</div>
+        </div>
+        <div class="card-body">
+          <div style="display:grid;grid-template-columns:repeat(3, 1fr);gap:var(--space-4);font-size:var(--text-xs)">
+            <div style="background:var(--color-bg-secondary);padding:var(--space-3);border-radius:var(--radius-md);border:1px solid var(--color-border)">
+              <div style="font-weight:600;color:var(--color-accent);margin-bottom:4px"><i class="fas fa-network-wired"></i> Communication Protocol</div>
+              <p style="color:var(--color-text-muted);margin:0;line-height:1.5">
+                Edge hardware communicates via 802.11 b/g/n Wi-Fi sending HTTP/REST payloads (JSON) to <code>/api/events</code> and <code>/api/nodes/{id}/status</code>.
+              </p>
+            </div>
+            <div style="background:var(--color-bg-secondary);padding:var(--space-3);border-radius:var(--radius-md);border:1px solid var(--color-border)">
+              <div style="font-weight:600;color:var(--color-accent);margin-bottom:4px"><i class="fas fa-shield-virus"></i> Hardware Simulation</div>
+              <p style="color:var(--color-text-muted);margin:0;line-height:1.5">
+                Physical ESP32 microcontrollers or the companion software simulator in <code>esp32/</code> dispatch simulated sensor events and periodic battery telemetry.
+              </p>
+            </div>
+            <div style="background:var(--color-bg-secondary);padding:var(--space-3);border-radius:var(--radius-md);border:1px solid var(--color-border)">
+              <div style="font-weight:600;color:var(--color-accent);margin-bottom:4px"><i class="fas fa-scale-balanced"></i> Academic Ethical Scope</div>
+              <p style="color:var(--color-text-muted);margin:0;line-height:1.5">
+                Sensors record synthetic environmental and spatial signals only. No real biometric, facial, or real-world surveillance hardware is permitted.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /page-body -->
+  </main>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- Scripts -->
+<script src="/js/api.js"></script>
+<script src="/js/websocket.js"></script>
+<script src="/js/app.js"></script>
+<script>
+let currentNodes = [];
+
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadNodes();
+
+  // WS listener
+  wsClient.on('new_event', (msg) => {
+    // Increment node activity subtly
+    const ev = msg.event;
+    if (ev && ev.node_id) {
+      const card = document.getElementById(`node-card-${ev.node_id}`);
+      if (card) {
+        card.style.borderColor = 'var(--color-accent)';
+        setTimeout(() => card.style.borderColor = 'var(--color-border)', 800);
+      }
+    }
+  });
+});
+
+async function loadNodes() {
+  try {
+    const nodes = await API.getNodes();
+    currentNodes = nodes || [];
+    renderNodeCards(currentNodes);
+    calculateNodeKPIs(currentNodes);
+  } catch (err) {
+    console.error('Failed to load nodes:', err);
+    Toast.error('Node Query Error', err.message);
+  }
+}
+
+function calculateNodeKPIs(nodes) {
+  const onlineCount = nodes.filter(n => n.status === 'online').length;
+  document.getElementById('kpi-online-count').textContent = onlineCount;
+  document.getElementById('kpi-online-sub').textContent = `${onlineCount} of ${nodes.length} online`;
+
+  if (nodes.length) {
+    const avgBatt = Math.round(nodes.reduce((acc, n) => acc + (n.battery || 0), 0) / nodes.length);
+    document.getElementById('kpi-avg-battery').textContent = `${avgBatt}%`;
+
+    const avgRssi = Math.round(nodes.reduce((acc, n) => acc + (n.signal_strength || -60), 0) / nodes.length);
+    document.getElementById('kpi-avg-rssi').textContent = `${avgRssi} dBm`;
+  }
+}
+
+function renderNodeCards(nodes) {
+  const container = document.getElementById('nodes-grid-container');
+  if (!nodes.length) {
+    container.innerHTML = '<div class="state-empty" style="grid-column:1/-1"><p>No field nodes registered.</p></div>';
+    return;
+  }
+
+  container.innerHTML = nodes.map(n => {
+    const isOnline = n.status === 'online';
+    const statusColor = isOnline ? 'var(--color-success)' : 'var(--color-danger)';
+    const batt = n.battery || 0;
+    const battColor = batt > 70 ? 'var(--color-success)' : (batt > 30 ? 'var(--color-warning)' : 'var(--color-danger)');
+
+    return `
+      <div class="card" id="node-card-${n.node_id}" style="border:1px solid var(--color-border);transition:var(--transition-fast)">
+        <div class="card-header flex justify-between items-center" style="padding:var(--space-4)">
+          <div class="flex items-center gap-3">
+            <div style="width:36px;height:36px;border-radius:var(--radius-md);background:var(--color-bg-secondary);border:1px solid var(--color-border);display:flex;align-items:center;justify-content:center;color:var(--color-accent)">
+              <i class="fas fa-microchip"></i>
+            </div>
+            <div>
+              <div style="font-family:var(--font-mono);font-size:var(--text-sm);font-weight:700;color:var(--color-text-primary)">
+                ${n.node_id}
+              </div>
+              <div style="font-size:11px;color:var(--color-text-muted)">${n.name}</div>
+            </div>
+          </div>
+          <span class="badge ${isOnline ? 'badge-online' : 'badge-offline'} flex items-center gap-1">
+            <span class="status-dot" style="background:${statusColor}"></span>
+            ${isOnline ? 'ONLINE' : 'OFFLINE'}
+          </span>
+        </div>
+
+        <div class="card-body" style="padding:var(--space-4);display:flex;flex-direction:column;gap:var(--space-3)">
+          <!-- Zone & Coordinates -->
+          <div class="flex justify-between items-center" style="font-size:var(--text-xs)">
+            <span style="color:var(--color-text-muted)">Assigned Sector:</span>
+            <span class="badge" style="background:rgba(59,130,246,0.12);color:var(--color-accent)">
+              <i class="fas fa-location-dot" style="font-size:9px;margin-right:2px"></i> ${n.zone_id}
+            </span>
+          </div>
+
+          <div class="flex justify-between items-center" style="font-size:var(--text-xs)">
+            <span style="color:var(--color-text-muted)">Coordinates:</span>
+            <span style="font-family:var(--font-mono);color:var(--color-text-secondary);font-size:11px">
+              ${Number(n.latitude).toFixed(4)}, ${Number(n.longitude).toFixed(4)}
+            </span>
+          </div>
+
+          <!-- Battery Gauge -->
+          <div>
+            <div class="flex justify-between items-center" style="font-size:var(--text-xs);margin-bottom:4px">
+              <span style="color:var(--color-text-muted)"><i class="fas fa-battery-half"></i> Battery:</span>
+              <span style="font-weight:600;color:${battColor}">${batt}%</span>
+            </div>
+            <div style="height:6px;width:100%;background:var(--color-bg-tertiary);border-radius:3px;overflow:hidden">
+              <div style="height:100%;width:${batt}%;background:${battColor};border-radius:3px;transition:width 0.4s ease"></div>
+            </div>
+          </div>
+
+          <!-- Signal Strength -->
+          <div class="flex justify-between items-center" style="font-size:var(--text-xs)">
+            <span style="color:var(--color-text-muted)"><i class="fas fa-wifi"></i> Signal (RSSI):</span>
+            <span style="font-family:var(--font-mono);color:var(--color-text-secondary)">
+              ${n.signal_strength || -60} dBm
+            </span>
+          </div>
+
+          <!-- Firmware & Last Seen -->
+          <div class="flex justify-between items-center" style="font-size:11px;color:var(--color-text-muted);border-top:1px solid var(--color-border);padding-top:var(--space-2)">
+            <span>FW: ${n.firmware_version || 'v2.1.0'}</span>
+            <span>Last seen: ${App.timeAgo(n.last_seen)}</span>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="card-footer flex justify-between gap-2" style="padding:var(--space-3) var(--space-4);background:var(--color-bg-secondary);border-top:1px solid var(--color-border)">
+          <button class="btn btn-secondary btn-sm" style="flex:1" onclick="pingNode('${n.node_id}')">
+            <i class="fas fa-satellite-dish"></i> Ping Telemetry
+          </button>
+          <button class="btn btn-ghost btn-sm" onclick="toggleNodeStatus('${n.node_id}', '${isOnline ? 'offline' : 'online'}')">
+            <i class="fas ${isOnline ? 'fa-toggle-on text-success' : 'fa-toggle-off text-muted'}"></i>
+          </button>
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+async function pingNode(nodeId) {
+  try {
+    const randomBattery = Math.floor(Math.random() * 25) + 70;
+    const randomRssi = -Math.floor(Math.random() * 30) - 40;
+    await API.updateNodeStatus(nodeId, {
+      status: 'online',
+      battery: randomBattery,
+      signal_strength: randomRssi
+    });
+    Toast.success('Heartbeat Received', `Node ${nodeId} telemetry synchronized.`);
+    await loadNodes();
+  } catch (err) {
+    Toast.error('Ping Failed', err.message);
+  }
+}
+
+async function toggleNodeStatus(nodeId, newStatus) {
+  try {
+    await API.updateNodeStatus(nodeId, { status: newStatus });
+    Toast.info('Status Changed', `Node ${nodeId} set to ${newStatus}.`);
+    await loadNodes();
+  } catch (err) {
+    Toast.error('Update Failed', err.message);
+  }
+}
+</script>
+</body>
+</html>

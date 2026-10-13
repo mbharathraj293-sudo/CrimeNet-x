@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Network Intelligence — CRIMENET-X</title>
+  <meta name="description" content="Graph-based relationship intelligence and analytical pattern cluster mapping.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+</head>
+<body>
+<div class="app-shell">
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <a href="/index.html" class="sidebar-logo">
+        <div class="logo-icon"><i class="fas fa-shield-halved"></i></div>
+        <div class="logo-text">
+          <span class="logo-title">CRIMENET-X</span>
+          <span class="logo-subtitle">Intelligence Analytics</span>
+        </div>
+      </a>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Main</div>
+      <a href="/pages/command-center.html"      class="nav-item"><i class="fas fa-gauge-high"></i>Command Center</a>
+      <a href="/pages/live-events.html"          class="nav-item"><i class="fas fa-bolt"></i>Live Events</a>
+      <a href="/pages/network-intelligence.html" class="nav-item active"><i class="fas fa-diagram-project"></i>Network Intelligence</a>
+      <a href="/pages/geo-intelligence.html"     class="nav-item"><i class="fas fa-map-location-dot"></i>Geo Intelligence</a>
+      <a href="/pages/timeline-analysis.html"    class="nav-item"><i class="fas fa-chart-line"></i>Timeline Analysis</a>
+      <div class="nav-section-label" style="margin-top:8px">Operations</div>
+      <a href="/pages/field-nodes.html"          class="nav-item"><i class="fas fa-microchip"></i>Field Nodes</a>
+      <a href="/pages/alert-center.html"         class="nav-item"><i class="fas fa-bell"></i>Alert Center<span class="nav-badge" id="sidebar-alert-count">0</span></a>
+      <a href="/pages/data-management.html"      class="nav-item"><i class="fas fa-database"></i>Data Management</a>
+      <a href="/pages/system-settings.html"      class="nav-item"><i class="fas fa-sliders"></i>System Settings</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="system-status-indicator">
+        <span class="status-dot" id="sys-dot"></span>
+        <span id="sys-status-text">System Operational</span>
+      </div>
+      <div class="sidebar-version">v1.0.0 · Academic Prototype</div>
+    </div>
+  </aside>
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Top Bar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="btn-hamburger" id="btn-hamburger"><i class="fas fa-bars"></i></button>
+        <div class="search-container">
+          <i class="fas fa-search search-icon"></i>
+          <input type="text" class="search-input" id="global-search" placeholder="Search events, nodes, alerts...">
+          <div class="search-results hidden" id="search-results"></div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="demo-badge" id="demo-badge"><span class="live-dot"></span>DEMO LIVE</div>
+        <div class="topbar-indicator" id="api-indicator" style="color:var(--color-text-muted)">● Connecting...</div>
+        <div class="topbar-indicator ws-indicator" style="color:var(--color-text-muted)">● Connecting...</div>
+        <span class="topbar-time" id="topbar-clock"></span>
+        <button class="topbar-btn" title="Notifications" onclick="window.location='/pages/alert-center.html'">
+          <i class="fas fa-bell"></i>
+          <span class="notification-badge" id="notif-badge">0</span>
+        </button>
+        <div class="user-avatar" title="Analyst">AN</div>
+      </div>
+    </header>
+
+    <!-- Page Body -->
+    <div class="page-body">
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="page-header-row">
+          <div>
+            <h1 class="page-title">Network Intelligence</h1>
+            <p class="page-subtitle">Interactive topological analysis of synthetic entities, correlation clusters, and analytical pattern scores.</p>
+          </div>
+          <div class="flex gap-3 items-center">
+            <button class="btn btn-secondary" onclick="NetworkGraph.reset()">
+              <i class="fas fa-expand"></i> Reset View
+            </button>
+            <button id="btn-demo-start" class="btn btn-primary" onclick="App.toggleDemo()">
+              <i class="fas fa-play"></i> Start Demo
+            </button>
+            <button id="btn-demo-stop" class="btn btn-danger hidden" onclick="App.toggleDemo()">
+              <i class="fas fa-stop"></i> Stop Demo
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Network Layout Container -->
+      <div class="network-container">
+        <!-- Cytoscape Graph Canvas Area -->
+        <div class="card" style="display:flex;flex-direction:column;height:100%;overflow:hidden">
+          <div class="card-header flex justify-between items-center" style="padding:var(--space-3) var(--space-4)">
+            <div class="network-controls" style="margin:0">
+              <button class="btn btn-ghost btn-sm" onclick="NetworkGraph.zoomIn()" title="Zoom In"><i class="fas fa-plus"></i></button>
+              <button class="btn btn-ghost btn-sm" onclick="NetworkGraph.zoomOut()" title="Zoom Out"><i class="fas fa-minus"></i></button>
+              <button class="btn btn-ghost btn-sm" onclick="NetworkGraph.fit()" title="Fit to Screen"><i class="fas fa-compress"></i> Fit</button>
+              <div style="border-left:1px solid var(--color-border);margin:0 4px;height:20px"></div>
+              <button class="btn btn-ghost btn-sm active" id="layout-cose" onclick="switchLayout('cose')">Force (CoSE)</button>
+              <button class="btn btn-ghost btn-sm" id="layout-concentric" onclick="switchLayout('concentric')">Concentric</button>
+              <button class="btn btn-ghost btn-sm" id="layout-circle" onclick="switchLayout('circle')">Circle</button>
+            </div>
+
+            <!-- Legend -->
+            <div class="network-legend" style="margin:0">
+              <span class="flex items-center gap-1" style="font-size:11px;color:var(--color-text-secondary)">
+                <i class="fas fa-circle" style="color:#4f8ef7;font-size:8px"></i> Zone
+              </span>
+              <span class="flex items-center gap-1" style="font-size:11px;color:var(--color-text-secondary)">
+                <i class="fas fa-circle" style="color:#22c55e;font-size:8px"></i> Node
+              </span>
+              <span class="flex items-center gap-1" style="font-size:11px;color:var(--color-text-secondary)">
+                <i class="fas fa-circle" style="color:#f59e0b;font-size:8px"></i> Event Type
+              </span>
+              <span class="flex items-center gap-1" style="font-size:11px;color:var(--color-text-secondary)">
+                <i class="fas fa-circle" style="color:#a78bfa;font-size:8px"></i> Entity
+              </span>
+            </div>
+          </div>
+
+          <div class="card-body" style="padding:0;flex:1;position:relative">
+            <div id="cy" style="width:100%;height:100%;min-height:550px"></div>
+            <div id="graph-loading" class="flex flex-col items-center justify-center" style="position:absolute;inset:0;background:rgba(10,14,20,0.7);z-index:10">
+              <div class="loading-spinner" style="margin-bottom:8px"></div>
+              <span style="font-size:var(--text-xs);color:var(--color-text-muted)">Generating network topology...</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Side Panel: Clusters, Inspection & Metrics -->
+        <div class="flex flex-col gap-4" style="height:100%;overflow-y:auto">
+          <!-- Cluster Selector Card -->
+          <div class="card">
+            <div class="card-header">
+              <div class="card-title" style="font-size:var(--text-sm)">
+                <i class="fas fa-filter"></i> Cluster Filter
+              </div>
+            </div>
+            <div class="card-body" style="padding:var(--space-4)">
+              <label class="form-label">Active Network Subgraph</label>
+              <select id="cluster-select" class="form-control" onchange="handleClusterChange()">
+                <option value="full">All Subgraphs (Complete System)</option>
+                <!-- Populated dynamically -->
+              </select>
+
+              <div style="margin-top:var(--space-4);display:grid;grid-template-columns:1fr 1fr;gap:var(--space-3)">
+                <div style="background:var(--color-bg-secondary);padding:var(--space-3);border-radius:var(--radius-md);border:1px solid var(--color-border)">
+                  <div style="font-size:10px;color:var(--color-text-muted);text-transform:uppercase">Nodes</div>
+                  <div id="graph-stat-nodes" style="font-size:var(--text-lg);font-weight:700;color:var(--color-text-primary)">—</div>
+                </div>
+                <div style="background:var(--color-bg-secondary);padding:var(--space-3);border-radius:var(--radius-md);border:1px solid var(--color-border)">
+                  <div style="font-size:10px;color:var(--color-text-muted);text-transform:uppercase">Edges</div>
+                  <div id="graph-stat-edges" style="font-size:var(--text-lg);font-weight:700;color:var(--color-text-primary)">—</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Selected Node Details Drawer -->
+          <div class="card" style="flex:1">
+            <div class="card-header">
+              <div class="card-title" style="font-size:var(--text-sm)">
+                <i class="fas fa-circle-nodes"></i> Node Detail
+              </div>
+            </div>
+            <div class="card-body" style="padding:var(--space-4)">
+              <div id="node-detail-panel" style="display:none">
+                <!-- Dynamically populated by NetworkGraph module -->
+              </div>
+              <div id="node-detail-empty" class="state-empty" style="padding:var(--space-6)">
+                <i class="fas fa-hand-pointer" style="font-size:24px;margin-bottom:8px"></i>
+                <p style="font-size:var(--text-xs);margin:0">Click on any network node to inspect centrality metrics and analytical score.</p>
+              </div>
+
+              <!-- Ethical Score Interpretation Banner -->
+              <div class="review-banner" style="margin-top:var(--space-5);font-size:10px;line-height:1.4;padding:var(--space-3)">
+                <div style="font-weight:600;margin-bottom:2px">
+                  <i class="fas fa-triangle-exclamation"></i> Analytical Pattern Score Notice
+                </div>
+                Graph centrality and pattern scores measure statistical topology in synthetic data only. Never to be interpreted as personal guilt or automated enforcement recommendations.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /page-body -->
+  </main>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cytoscape/3.28.1/cytoscape.min.js"></script>
+<script src="/js/api.js"></script>
+<script src="/js/websocket.js"></script>
+<script src="/js/app.js"></script>
+<script src="/js/network.js"></script>
+<script>
+let fullGraphData = null;
+let currentCluster = 'full';
+
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadNetworksList();
+  await loadGraph('full');
+});
+
+async function loadNetworksList() {
+  try {
+    const networks = await API.getNetworks();
+    const select = document.getElementById('cluster-select');
+    if (networks && networks.length) {
+      networks.forEach(net => {
+        const opt = document.createElement('option');
+        opt.value = net.network_id;
+        opt.textContent = `${net.name} (Score: ${net.risk_score || net.score || '—'})`;
+        select.appendChild(opt);
+      });
+    }
+  } catch (err) {
+    console.error('Failed to load networks:', err);
+  }
+}
+
+async function loadGraph(target) {
+  const loader = document.getElementById('graph-loading');
+  loader.style.display = 'flex';
+  try {
+    let graphData;
+    if (target === 'full') {
+      graphData = await API.getFullGraph();
+      fullGraphData = graphData;
+    } else {
+      graphData = await API.getNetworkGraph(target);
+    }
+
+    if (graphData && graphData.elements) {
+      NetworkGraph.init('cy', graphData.elements);
+      const nodeCount = graphData.elements.filter(e => !e.data.source).length;
+      const edgeCount = graphData.elements.filter(e => e.data.source).length;
+      document.getElementById('graph-stat-nodes').textContent = nodeCount;
+      document.getElementById('graph-stat-edges').textContent = edgeCount;
+    }
+  } catch (err) {
+    console.error('Graph load failed:', err);
+    Toast.error('Graph Load Failed', err.message);
+  } finally {
+    loader.style.display = 'none';
+  }
+}
+
+function handleClusterChange() {
+  const val = document.getElementById('cluster-select').value;
+  currentCluster = val;
+  loadGraph(val);
+}
+
+function switchLayout(layoutName) {
+  ['cose', 'concentric', 'circle'].forEach(l => {
+    document.getElementById(`layout-${l}`)?.classList.remove('active');
+  });
+  document.getElementById(`layout-${layoutName}`)?.classList.add('active');
+  NetworkGraph.runLayout(layoutName);
+}
+</script>
+</body>
+</html>

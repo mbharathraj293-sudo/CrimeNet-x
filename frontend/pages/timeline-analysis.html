@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Timeline Analysis — CRIMENET-X</title>
+  <meta name="description" content="Temporal distribution, diurnal cycles, and analytical pattern trend modeling.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+  <link rel="stylesheet" href="/css/style.css">
+  <link rel="stylesheet" href="/css/components.css">
+  <link rel="stylesheet" href="/css/dashboard.css">
+  <link rel="stylesheet" href="/css/responsive.css">
+</head>
+<body>
+<div class="app-shell">
+
+  <!-- Sidebar -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+      <a href="/index.html" class="sidebar-logo">
+        <div class="logo-icon"><i class="fas fa-shield-halved"></i></div>
+        <div class="logo-text">
+          <span class="logo-title">CRIMENET-X</span>
+          <span class="logo-subtitle">Intelligence Analytics</span>
+        </div>
+      </a>
+    </div>
+    <nav class="sidebar-nav">
+      <div class="nav-section-label">Main</div>
+      <a href="/pages/command-center.html"      class="nav-item"><i class="fas fa-gauge-high"></i>Command Center</a>
+      <a href="/pages/live-events.html"          class="nav-item"><i class="fas fa-bolt"></i>Live Events</a>
+      <a href="/pages/network-intelligence.html" class="nav-item"><i class="fas fa-diagram-project"></i>Network Intelligence</a>
+      <a href="/pages/geo-intelligence.html"     class="nav-item"><i class="fas fa-map-location-dot"></i>Geo Intelligence</a>
+      <a href="/pages/timeline-analysis.html"    class="nav-item active"><i class="fas fa-chart-line"></i>Timeline Analysis</a>
+      <div class="nav-section-label" style="margin-top:8px">Operations</div>
+      <a href="/pages/field-nodes.html"          class="nav-item"><i class="fas fa-microchip"></i>Field Nodes</a>
+      <a href="/pages/alert-center.html"         class="nav-item"><i class="fas fa-bell"></i>Alert Center<span class="nav-badge" id="sidebar-alert-count">0</span></a>
+      <a href="/pages/data-management.html"      class="nav-item"><i class="fas fa-database"></i>Data Management</a>
+      <a href="/pages/system-settings.html"      class="nav-item"><i class="fas fa-sliders"></i>System Settings</a>
+    </nav>
+    <div class="sidebar-footer">
+      <div class="system-status-indicator">
+        <span class="status-dot" id="sys-dot"></span>
+        <span id="sys-status-text">System Operational</span>
+      </div>
+      <div class="sidebar-version">v1.0.0 · Academic Prototype</div>
+    </div>
+  </aside>
+  <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+  <!-- Main Content -->
+  <main class="main-content">
+    <!-- Top Bar -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <button class="btn-hamburger" id="btn-hamburger"><i class="fas fa-bars"></i></button>
+        <div class="search-container">
+          <i class="fas fa-search search-icon"></i>
+          <input type="text" class="search-input" id="global-search" placeholder="Search events, nodes, alerts...">
+          <div class="search-results hidden" id="search-results"></div>
+        </div>
+      </div>
+      <div class="topbar-right">
+        <div class="demo-badge" id="demo-badge"><span class="live-dot"></span>DEMO LIVE</div>
+        <div class="topbar-indicator" id="api-indicator" style="color:var(--color-text-muted)">● Connecting...</div>
+        <div class="topbar-indicator ws-indicator" style="color:var(--color-text-muted)">● Connecting...</div>
+        <span class="topbar-time" id="topbar-clock"></span>
+        <button class="topbar-btn" title="Notifications" onclick="window.location='/pages/alert-center.html'">
+          <i class="fas fa-bell"></i>
+          <span class="notification-badge" id="notif-badge">0</span>
+        </button>
+        <div class="user-avatar" title="Analyst">AN</div>
+      </div>
+    </header>
+
+    <!-- Page Body -->
+    <div class="page-body">
+      <!-- Page Header -->
+      <div class="page-header">
+        <div class="page-header-row">
+          <div>
+            <h1 class="page-title">Timeline Analysis</h1>
+            <p class="page-subtitle">Temporal cadence modeling, 24-hour diurnal patterns, and event recurrence velocity across synthetic clusters.</p>
+          </div>
+          <div class="flex gap-3 items-center">
+            <button class="btn btn-secondary" onclick="loadTemporalData()">
+              <i class="fas fa-arrows-rotate"></i> Refresh Analytics
+            </button>
+            <button id="btn-demo-start" class="btn btn-primary" onclick="App.toggleDemo()">
+              <i class="fas fa-play"></i> Start Demo
+            </button>
+            <button id="btn-demo-stop" class="btn btn-danger hidden" onclick="App.toggleDemo()">
+              <i class="fas fa-stop"></i> Stop Demo
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Temporal Summary Stats Cards -->
+      <div class="dashboard-row-1" style="margin-bottom:var(--space-5)">
+        <div class="kpi-card" style="--kpi-color:#3b82f6;--kpi-bg:rgba(59,130,246,0.12)">
+          <div class="kpi-header">
+            <div class="kpi-icon"><i class="fas fa-clock"></i></div>
+            <div class="kpi-trend"><i class="fas fa-bolt"></i> Peak Hour</div>
+          </div>
+          <div class="kpi-value" id="stat-peak-hour">—</div>
+          <div class="kpi-label">Peak Activity Window</div>
+          <div class="kpi-sub">Highest synthetic observation rate</div>
+        </div>
+        <div class="kpi-card" style="--kpi-color:#22c55e;--kpi-bg:rgba(34,197,94,0.12)">
+          <div class="kpi-header">
+            <div class="kpi-icon"><i class="fas fa-calendar-day"></i></div>
+            <div class="kpi-trend"><i class="fas fa-arrow-up"></i> Active</div>
+          </div>
+          <div class="kpi-value" id="stat-daily-avg">—</div>
+          <div class="kpi-label">Daily Avg Observations</div>
+          <div class="kpi-sub">Calculated over observed dates</div>
+        </div>
+        <div class="kpi-card" style="--kpi-color:#f59e0b;--kpi-bg:rgba(245,158,11,0.12)">
+          <div class="kpi-header">
+            <div class="kpi-icon"><i class="fas fa-moon"></i></div>
+            <div class="kpi-trend"><i class="fas fa-chart-pie"></i> Nocturnal</div>
+          </div>
+          <div class="kpi-value" id="stat-night-ratio">—</div>
+          <div class="kpi-label">Night Activity Ratio</div>
+          <div class="kpi-sub">22:00 to 06:00 observations</div>
+        </div>
+        <div class="kpi-card" style="--kpi-color:#a78bfa;--kpi-bg:rgba(167,139,250,0.12)">
+          <div class="kpi-header">
+            <div class="kpi-icon"><i class="fas fa-chart-line"></i></div>
+            <div class="kpi-trend"><i class="fas fa-network-wired"></i> Evolution</div>
+          </div>
+          <div class="kpi-value" id="stat-recurrence">—</div>
+          <div class="kpi-label">Recurrent Clusters</div>
+          <div class="kpi-sub">Temporal links identified</div>
+        </div>
+      </div>
+
+      <!-- Charts Grid Row 1: Hourly Distribution + Event Types -->
+      <div style="display:grid;grid-template-columns:1.5fr 1fr;gap:var(--space-5);margin-bottom:var(--space-5)">
+        <div class="card">
+          <div class="card-header flex justify-between items-center">
+            <div class="card-title">
+              <i class="fas fa-chart-column"></i> 24-Hour Diurnal Cycle Distribution
+            </div>
+            <span style="font-size:11px;color:var(--color-text-muted)">Events per hour of day</span>
+          </div>
+          <div class="card-body">
+            <div class="chart-container" style="height:260px">
+              <canvas id="chart-hourly"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header flex justify-between items-center">
+            <div class="card-title">
+              <i class="fas fa-chart-pie"></i> Event Classification Mix
+            </div>
+            <span style="font-size:11px;color:var(--color-text-muted)">Synthetic event categories</span>
+          </div>
+          <div class="card-body">
+            <div class="chart-container" style="height:260px">
+              <canvas id="chart-event-types"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Charts Grid Row 2: Daily Trend + Zone Timeline -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:var(--space-5);margin-bottom:var(--space-5)">
+        <div class="card">
+          <div class="card-header flex justify-between items-center">
+            <div class="card-title">
+              <i class="fas fa-calendar-week"></i> Daily Activity Timeline
+            </div>
+            <span style="font-size:11px;color:var(--color-text-muted)">Total events per calendar date</span>
+          </div>
+          <div class="card-body">
+            <div class="chart-container" style="height:260px">
+              <canvas id="chart-daily"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-header flex justify-between items-center">
+            <div class="card-title">
+              <i class="fas fa-diagram-next"></i> Network Relationship Evolution
+            </div>
+            <span style="font-size:11px;color:var(--color-text-muted)">Cumulative topological link growth</span>
+          </div>
+          <div class="card-body">
+            <div class="chart-container" style="height:260px">
+              <canvas id="chart-network-evolution"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Ethical Notice Banner -->
+      <div class="landing-disclaimer">
+        <i class="fas fa-shield-halved" style="color:var(--color-accent);margin-right:6px"></i>
+        <strong>Academic Temporal Analytics:</strong> Temporal clustering algorithms identify statistical time-density spikes in synthetic data. These mathematical observations highlight recurrence cadence and never replace human investigative judgment.
+      </div>
+
+    </div><!-- /page-body -->
+  </main>
+</div>
+
+<!-- Toast Container -->
+<div class="toast-container" id="toast-container"></div>
+
+<!-- Scripts -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<script src="/js/api.js"></script>
+<script src="/js/websocket.js"></script>
+<script src="/js/app.js"></script>
+<script src="/js/charts.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadTemporalData();
+
+  // WS listener - re-query on new demo events occasionally
+  let eventAccumulator = 0;
+  wsClient.on('new_event', () => {
+    eventAccumulator++;
+    if (eventAccumulator >= 10) {
+      eventAccumulator = 0;
+      loadTemporalData();
+    }
+  });
+});
+
+async function loadTemporalData() {
+  try {
+    const data = await API.getTemporal();
+    if (!data) return;
+
+    // 1. Hourly chart
+    if (data.hourly) {
+      Charts.createHourlyChart('chart-hourly', data.hourly);
+      
+      // Calculate peak hour
+      const hourlyData = data.hourly.data || [];
+      const hourlyLabels = data.hourly.labels || [];
+      if (hourlyData.length) {
+        let maxVal = -1, maxIdx = 0;
+        let nightSum = 0, totalSum = 0;
+        hourlyData.forEach((val, i) => {
+          totalSum += val;
+          if (val > maxVal) { maxVal = val; maxIdx = i; }
+          if (i <= 6 || i >= 22) nightSum += val;
+        });
+        document.getElementById('stat-peak-hour').textContent = hourlyLabels[maxIdx] || '14:00';
+        const nightRatio = totalSum > 0 ? Math.round((nightSum / totalSum) * 100) : 0;
+        document.getElementById('stat-night-ratio').textContent = `${nightRatio}%`;
+      }
+    }
+
+    // 2. Event Types Donut
+    if (data.event_types) {
+      Charts.createEventTypeChart('chart-event-types', data.event_types);
+    }
+
+    // 3. Daily Distribution
+    if (data.daily) {
+      Charts.createDailyChart('chart-daily', data.daily);
+      const dailyVals = data.daily.data || [];
+      if (dailyVals.length) {
+        const sum = dailyVals.reduce((a, b) => a + b, 0);
+        document.getElementById('stat-daily-avg').textContent = Math.round(sum / dailyVals.length);
+      }
+    }
+
+    // 4. Network Evolution
+    if (data.network_evolution) {
+      Charts.createNetworkEvolutionChart('chart-network-evolution', data.network_evolution);
+      const evoVals = data.network_evolution.data || [];
+      if (evoVals.length) {
+        document.getElementById('stat-recurrence').textContent = evoVals[evoVals.length - 1];
+      }
+    }
+
+  } catch (err) {
+    console.error('Failed to load temporal analytics:', err);
+    Toast.error('Analytics Error', err.message);
+  }
+}
+</script>
+</body>
+</html>

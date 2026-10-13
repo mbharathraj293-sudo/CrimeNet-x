@@ -1,0 +1,10 @@
+[
+  {"zone_id": "Z-01", "name": "Zone Alpha",   "latitude": 12.9716, "longitude": 77.5946, "primary_node": "N-04", "type": "Metropolitan Core"},
+  {"zone_id": "Z-02", "name": "Zone Beta",    "latitude": 12.9800, "longitude": 77.6100, "primary_node": "N-03", "type": "Commercial Corridor"},
+  {"zone_id": "Z-03", "name": "Zone Gamma",   "latitude": 12.9650, "longitude": 77.5800, "primary_node": "N-01", "type": "High Recurrence Sector"},
+  {"zone_id": "Z-04", "name": "Zone Delta",   "latitude": 12.9550, "longitude": 77.6200, "primary_node": "N-02", "type": "Transit Hub"},
+  {"zone_id": "Z-05", "name": "Zone Epsilon", "latitude": 12.9900, "longitude": 77.5700, "primary_node": "N-02", "type": "Industrial District"},
+  {"zone_id": "Z-06", "name": "Zone Zeta",    "latitude": 12.9450, "longitude": 77.5900, "primary_node": "N-04", "type": "Southern Perimeter"},
+  {"zone_id": "Z-07", "name": "Zone Eta",     "latitude": 13.0000, "longitude": 77.6050, "primary_node": "N-05", "type": "Northern Gateway"},
+  {"zone_id": "Z-08", "name": "Zone Theta",   "latitude": 12.9600, "longitude": 77.6300, "primary_node": "N-05", "type": "Eastern Sector"}
+]
